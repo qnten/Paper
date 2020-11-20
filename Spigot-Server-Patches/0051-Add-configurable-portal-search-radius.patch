@@ -5,7 +5,7 @@ Subject: [PATCH] Add configurable portal search radius
 
 
 diff --git a/src/main/java/com/destroystokyo/paper/PaperWorldConfig.java b/src/main/java/com/destroystokyo/paper/PaperWorldConfig.java
-index e2cb804fd40e236337c37d89dfc85a02486c1bf4..bb9b54ee0a3f705574394329919febfcb9ef837a 100644
+index e2cb804fd40e236337c37d89dfc85a02486c1bf4..9537bf95a007cd6896dcc41837fd3fe5f7e6aa6b 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperWorldConfig.java
 +++ b/src/main/java/com/destroystokyo/paper/PaperWorldConfig.java
 @@ -192,4 +192,13 @@ public class PaperWorldConfig {
@@ -15,15 +15,15 @@ index e2cb804fd40e236337c37d89dfc85a02486c1bf4..bb9b54ee0a3f705574394329919febfc
 +
 +    public int portalSearchRadius;
 +    public int portalCreateRadius;
-+    public boolean portalSearchRadiusNetherNerf;
++    public boolean portalSearchVanillaDimensionScaling;
 +    private void portalSearchRadius() {
 +        portalSearchRadius = getInt("portal-search-radius", 128);
 +        portalCreateRadius = getInt("portal-create-radius", 16);
-+        portalSearchRadiusNetherNerf = getBoolean("portal-search-radius-nether-nerf", true);
++        portalSearchVanillaDimensionScaling = getBoolean("portal-search-vanilla-dimension-scaling", true);
 +    }
  }
 diff --git a/src/main/java/net/minecraft/server/Entity.java b/src/main/java/net/minecraft/server/Entity.java
-index 52595b6534e2798b36b3a7c2d97451bd0ea2f3a0..e12dfe8fe05bc47a37fefcb3b915aed5de174908 100644
+index 52595b6534e2798b36b3a7c2d97451bd0ea2f3a0..eb67002cbb9aa9e40702282286fd9d98f3f4440e 100644
 --- a/src/main/java/net/minecraft/server/Entity.java
 +++ b/src/main/java/net/minecraft/server/Entity.java
 @@ -2528,7 +2528,13 @@ public abstract class Entity implements INamableTileEntity, ICommandListener, Ke
@@ -33,8 +33,8 @@ index 52595b6534e2798b36b3a7c2d97451bd0ea2f3a0..e12dfe8fe05bc47a37fefcb3b915aed5
 -                CraftPortalEvent event = callPortalEvent(this, worldserver, blockposition, PlayerTeleportEvent.TeleportCause.NETHER_PORTAL, flag2 ? 16 : 128, 16);
 +                // Paper start
 +                int portalSearchRadius = worldserver.paperConfig.portalSearchRadius;
-+                if (world.paperConfig.portalSearchRadiusNetherNerf && flag2) { // == THE_NETHER
-+                    portalSearchRadius = portalSearchRadius / 8;
++                if (world.paperConfig.portalSearchVanillaDimensionScaling && flag2) { // == THE_NETHER
++                    portalSearchRadius = (int) (portalSearchRadius / worldserver.getDimensionManager().getCoordinateScale());
 +                }
 +                // Paper end
 +                CraftPortalEvent event = callPortalEvent(this, worldserver, blockposition, PlayerTeleportEvent.TeleportCause.NETHER_PORTAL, portalSearchRadius, worldserver.paperConfig.portalCreateRadius); // Paper start - configurable portal radius
