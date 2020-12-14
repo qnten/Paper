@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: JRoy <joshroy126@gmail.com>
+Date: Fri, 5 Jun 2020 18:24:06 -0400
+Subject: [PATCH] Add and implement PlayerRecipeBookClickEvent
+
+
+diff --git a/src/main/java/net/minecraft/server/PlayerConnection.java b/src/main/java/net/minecraft/server/PlayerConnection.java
+index 85b5696841bf5a720a35c488413088856ad29ce2..c8666caf7ecba53a5bb99ba0be5b060894f84ce3 100644
+--- a/src/main/java/net/minecraft/server/PlayerConnection.java
++++ b/src/main/java/net/minecraft/server/PlayerConnection.java
+@@ -2605,9 +2605,15 @@ public class PlayerConnection implements PacketListenerPlayIn {
+         PlayerConnectionUtils.ensureMainThread(packetplayinautorecipe, this, this.player.getWorldServer());
+         this.player.resetIdleTimer();
+         if (!this.player.isSpectator() && this.player.activeContainer.windowId == packetplayinautorecipe.b() && this.player.activeContainer.c(this.player) && this.player.activeContainer instanceof ContainerRecipeBook) {
+-            this.minecraftServer.getCraftingManager().getRecipe(packetplayinautorecipe.c()).ifPresent((irecipe) -> {
+-                ((ContainerRecipeBook) this.player.activeContainer).a(packetplayinautorecipe.d(), irecipe, this.player);
+-            });
++            // Paper start - fire event for clicking recipes in the recipe book
++            com.destroystokyo.paper.event.player.PlayerRecipeBookClickEvent event = new com.destroystokyo.paper.event.player.PlayerRecipeBookClickEvent(
++                player.getBukkitEntity(), org.bukkit.craftbukkit.util.CraftNamespacedKey.fromMinecraft(packetplayinautorecipe.c()), packetplayinautorecipe.d());
++            if (event.callEvent()) {
++                this.minecraftServer.getCraftingManager().getRecipe(org.bukkit.craftbukkit.util.CraftNamespacedKey.toMinecraft(event.getRecipe())).ifPresent((irecipe) -> {
++                    ((ContainerRecipeBook) this.player.activeContainer).a(event.isMakeAll(), irecipe, this.player);
++                });
++            }
++            // Paper end
+         }
+     }
+ 
