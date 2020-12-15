@@ -39,4 +39,4 @@ jobs:
               with:
                   name: maven-target
                   path: |
-                     /home/runner/work/Paper/Paper/Paper-Server/target/
+                     /home/runner/work/Paper/Paper/Paper-Server/target/*.jar
