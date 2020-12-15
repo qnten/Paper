@@ -3,7 +3,7 @@
 # Note that there is no artifact step in this script. We do not want Paperclip
 # jars to be built for every push & PR; our CI handles pushes to branches, while
 # PRs can themselves link to Paperclip jars if it is necessary. Official such
-# PRs will take use of testing builds.
+# PRs will take use of testing builds.   
 
 name: Build Paper
 on: [push, pull_request]
